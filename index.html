@@ -1,0 +1,2174 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="stylesheet" href="css/leaflet.css">
+        <link rel="stylesheet" href="css/qgis2web.css"><link rel="stylesheet" href="css/fontawesome-all.min.css">
+        <link rel="stylesheet" href="css/leaflet-search.css">
+        <link rel="stylesheet" href="css/filter.css">
+<link rel="stylesheet" href="css/nouislider.min.css">
+        <style>
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+        </style>
+        <title>Lycées en Haute Vienne et étudiants à l'université de Limoges</title>
+    </head>
+    <body>
+        <div id="map">
+        </div>
+        <script src="js/qgis2web_expressions.js"></script>
+        <script src="js/leaflet.js"></script>
+        <script src="js/multi-style-layer.js"></script>
+        <script src="js/leaflet-svg-shape-markers.min.js"></script>
+        <script src="js/leaflet.rotatedMarker.js"></script>
+        <script src="js/leaflet.pattern.js"></script>
+        <script src="js/leaflet-hash.js"></script>
+        <script src="js/Autolinker.min.js"></script>
+        <script src="js/rbush.min.js"></script>
+        <script src="js/labelgun.min.js"></script>
+        <script src="js/labels.js"></script>
+        <script src="js/leaflet-search.js"></script>
+        <script src="js/tailDT.js"></script>
+<script src="js/nouislider.min.js"></script>
+<script src="js/wNumb.js"></script>
+        <script src="data/Dept_87_0.js"></script>
+        <script src="data/Comm_87_1.js"></script>
+        <script src="data/CU_Limoges_2.js"></script>
+        <script src="data/Lignes_TCL_3.js"></script>
+        <script src="data/Arret_Bus_4.js"></script>
+        <script src="data/lycees_5.js"></script>
+        <script src="data/Bu_Unilim_6.js"></script>
+        <script src="data/Etu_7.js"></script>
+        <script>
+        var map = L.map('map', {
+            zoomControl:true, maxZoom:28, minZoom:7
+        })
+        var hash = new L.Hash(map);
+        map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
+        var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
+        function removeEmptyRowsFromPopupContent(content, feature) {
+         var tempDiv = document.createElement('div');
+         tempDiv.innerHTML = content;
+         var rows = tempDiv.querySelectorAll('tr');
+         for (var i = 0; i < rows.length; i++) {
+             var td = rows[i].querySelector('td.visible-with-data');
+             var key = td ? td.id : '';
+             if (td && td.classList.contains('visible-with-data') && feature.properties[key] == null) {
+                 rows[i].parentNode.removeChild(rows[i]);
+             }
+         }
+         return tempDiv.innerHTML;
+        }
+        document.querySelector(".leaflet-popup-pane").addEventListener("load", function(event) {
+          var tagName = event.target.tagName,
+            popup = map._popup;
+          // Also check if flag is already set.
+          if (tagName === "IMG" && popup && !popup._updated) {
+            popup._updated = true; // Set flag to prevent looping.
+            popup.update();
+          }
+        }, true);
+        var bounds_group = new L.featureGroup([]);
+        function setBounds() {
+            if (bounds_group.getLayers().length) {
+                map.fitBounds(bounds_group.getBounds());
+            }
+        }
+        function pop_Dept_87_0(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ID_GEOFLA'] !== null ? autolinker.link(feature.properties['ID_GEOFLA'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CODE_COM'] !== null ? autolinker.link(feature.properties['CODE_COM'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['INSEE_COM'] !== null ? autolinker.link(feature.properties['INSEE_COM'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NOM_COM'] !== null ? autolinker.link(feature.properties['NOM_COM'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['STATUT'] !== null ? autolinker.link(feature.properties['STATUT'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['X_CHF_LIEU'] !== null ? autolinker.link(feature.properties['X_CHF_LIEU'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Y_CHF_LIEU'] !== null ? autolinker.link(feature.properties['Y_CHF_LIEU'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['X_CENTROID'] !== null ? autolinker.link(feature.properties['X_CENTROID'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Y_CENTROID'] !== null ? autolinker.link(feature.properties['Y_CENTROID'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Z_MOYEN'] !== null ? autolinker.link(feature.properties['Z_MOYEN'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['SUPERFICIE'] !== null ? autolinker.link(feature.properties['SUPERFICIE'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['POPULATION'] !== null ? autolinker.link(feature.properties['POPULATION'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CODE_CANT'] !== null ? autolinker.link(feature.properties['CODE_CANT'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CODE_ARR'] !== null ? autolinker.link(feature.properties['CODE_ARR'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CODE_DEPT'] !== null ? autolinker.link(feature.properties['CODE_DEPT'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NOM_DEPT'] !== null ? autolinker.link(feature.properties['NOM_DEPT'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CODE_REG'] !== null ? autolinker.link(feature.properties['CODE_REG'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NOM_REG'] !== null ? autolinker.link(feature.properties['NOM_REG'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+            var popup = layer.getPopup();
+            var content = popup.getContent();
+            var updatedContent = removeEmptyRowsFromPopupContent(content, feature);
+            popup.setContent(updatedContent);
+        }
+
+        function style_Dept_87_0_0() {
+            return {
+                pane: 'pane_Dept_87_0',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 3.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(225,89,137,0.0)',
+                interactive: false,
+            }
+        }
+        map.createPane('pane_Dept_87_0');
+        map.getPane('pane_Dept_87_0').style.zIndex = 400;
+        map.getPane('pane_Dept_87_0').style['mix-blend-mode'] = 'normal';
+        var layer_Dept_87_0 = new L.geoJson(json_Dept_87_0, {
+            attribution: '',
+            interactive: false,
+            dataVar: 'json_Dept_87_0',
+            layerName: 'layer_Dept_87_0',
+            pane: 'pane_Dept_87_0',
+            onEachFeature: pop_Dept_87_0,
+            style: style_Dept_87_0_0,
+        });
+        bounds_group.addLayer(layer_Dept_87_0);
+        map.addLayer(layer_Dept_87_0);
+        function pop_Comm_87_1(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ID'] !== null ? autolinker.link(feature.properties['ID'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NOM'] !== null ? autolinker.link(feature.properties['NOM'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NOM_M'] !== null ? autolinker.link(feature.properties['NOM_M'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['INSEE_COM'] !== null ? autolinker.link(feature.properties['INSEE_COM'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['STATUT'] !== null ? autolinker.link(feature.properties['STATUT'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['POPULATION'] !== null ? autolinker.link(feature.properties['POPULATION'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['INSEE_CAN'] !== null ? autolinker.link(feature.properties['INSEE_CAN'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['INSEE_ARR'] !== null ? autolinker.link(feature.properties['INSEE_ARR'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['INSEE_DEP'] !== null ? autolinker.link(feature.properties['INSEE_DEP'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['INSEE_REG'] !== null ? autolinker.link(feature.properties['INSEE_REG'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['SIREN_EPCI'] !== null ? autolinker.link(feature.properties['SIREN_EPCI'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CAL'] !== null ? autolinker.link(feature.properties['CAL'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+            var popup = layer.getPopup();
+            var content = popup.getContent();
+            var updatedContent = removeEmptyRowsFromPopupContent(content, feature);
+            popup.setContent(updatedContent);
+        }
+
+        function style_Comm_87_1_0() {
+            return {
+                pane: 'pane_Comm_87_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(190,207,80,0.3215686274509804)',
+                interactive: false,
+            }
+        }
+        map.createPane('pane_Comm_87_1');
+        map.getPane('pane_Comm_87_1').style.zIndex = 401;
+        map.getPane('pane_Comm_87_1').style['mix-blend-mode'] = 'normal';
+        var layer_Comm_87_1 = new L.geoJson(json_Comm_87_1, {
+            attribution: '',
+            interactive: false,
+            dataVar: 'json_Comm_87_1',
+            layerName: 'layer_Comm_87_1',
+            pane: 'pane_Comm_87_1',
+            onEachFeature: pop_Comm_87_1,
+            style: style_Comm_87_1_0,
+        });
+        bounds_group.addLayer(layer_Comm_87_1);
+        map.addLayer(layer_Comm_87_1);
+        function pop_CU_Limoges_2(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ID'] !== null ? autolinker.link(feature.properties['ID'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NOM'] !== null ? autolinker.link(feature.properties['NOM'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NOM_M'] !== null ? autolinker.link(feature.properties['NOM_M'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['INSEE_COM'] !== null ? autolinker.link(feature.properties['INSEE_COM'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['STATUT'] !== null ? autolinker.link(feature.properties['STATUT'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['POPULATION'] !== null ? autolinker.link(feature.properties['POPULATION'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['INSEE_CAN'] !== null ? autolinker.link(feature.properties['INSEE_CAN'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['INSEE_ARR'] !== null ? autolinker.link(feature.properties['INSEE_ARR'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['INSEE_DEP'] !== null ? autolinker.link(feature.properties['INSEE_DEP'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['INSEE_REG'] !== null ? autolinker.link(feature.properties['INSEE_REG'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['SIREN_EPCI'] !== null ? autolinker.link(feature.properties['SIREN_EPCI'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+            var popup = layer.getPopup();
+            var content = popup.getContent();
+            var updatedContent = removeEmptyRowsFromPopupContent(content, feature);
+            popup.setContent(updatedContent);
+        }
+
+        function style_CU_Limoges_2_0() {
+            return {
+                pane: 'pane_CU_Limoges_2',
+                opacity: 1,
+                color: 'rgba(227,26,28,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(125,139,143,0.0)',
+                interactive: false,
+            }
+        }
+        map.createPane('pane_CU_Limoges_2');
+        map.getPane('pane_CU_Limoges_2').style.zIndex = 402;
+        map.getPane('pane_CU_Limoges_2').style['mix-blend-mode'] = 'normal';
+        var layer_CU_Limoges_2 = new L.geoJson(json_CU_Limoges_2, {
+            attribution: '',
+            interactive: false,
+            dataVar: 'json_CU_Limoges_2',
+            layerName: 'layer_CU_Limoges_2',
+            pane: 'pane_CU_Limoges_2',
+            onEachFeature: pop_CU_Limoges_2,
+            style: style_CU_Limoges_2_0,
+        });
+        bounds_group.addLayer(layer_CU_Limoges_2);
+        map.addLayer(layer_CU_Limoges_2);
+        function pop_Lignes_TCL_3(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['code'] !== null ? autolinker.link(feature.properties['code'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['descriptio'] !== null ? autolinker.link(feature.properties['descriptio'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['id'] !== null ? autolinker.link(feature.properties['id'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['name'] !== null ? autolinker.link(feature.properties['name'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['parent_sta'] !== null ? autolinker.link(feature.properties['parent_sta'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['route_colo'] !== null ? autolinker.link(feature.properties['route_colo'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['route_id'] !== null ? autolinker.link(feature.properties['route_id'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['route_long'] !== null ? autolinker.link(feature.properties['route_long'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['route_shor'] !== null ? autolinker.link(feature.properties['route_shor'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['route_text'] !== null ? autolinker.link(feature.properties['route_text'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['wheelchair'] !== null ? autolinker.link(feature.properties['wheelchair'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+            var popup = layer.getPopup();
+            var content = popup.getContent();
+            var updatedContent = removeEmptyRowsFromPopupContent(content, feature);
+            popup.setContent(updatedContent);
+        }
+
+        function style_Lignes_TCL_3_0(feature) {
+            switch(String(feature.properties['route_shor'])) {
+                case '1':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 4.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '10':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 4.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '11':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 4.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '12':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 4.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '13':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 4.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '14':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 4.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '16':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 4.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '17':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 4.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '18':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 4.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '19':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 4.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '2':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 4.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '20':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 4.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '21':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 4.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '22':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 4.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '23':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 4.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '24':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 4.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '25':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 4.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '26':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 4.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '27':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 4.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '28':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 4.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '29':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 4.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '30':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 4.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '31':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 4.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '33':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 4.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '34':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 4.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '36':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 4.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '37':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 4.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '38':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 4.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '39':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 4.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '4':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 4.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '41':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 4.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '42':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 4.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '43':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 4.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '44':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 4.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '5':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 4.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '6':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 4.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '60':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 4.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '61':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 4.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '8':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 4.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case 'D1':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 4.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case 'D10':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 4.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case 'D4':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 4.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case 'D5':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 4.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case 'D8':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 4.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                default:
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 4.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+            }
+        }
+        function style_Lignes_TCL_3_1(feature) {
+            switch(String(feature.properties['route_shor'])) {
+                case '1':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(53,220,147,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 3.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '10':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(100,205,188,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 3.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '11':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(137,122,218,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 3.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '12':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(218,78,54,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 3.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '13':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(237,231,117,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 3.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '14':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(237,94,91,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 3.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '16':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(196,39,204,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 3.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '17':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(229,161,134,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 3.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '18':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(73,15,219,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 3.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '19':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(217,144,92,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 3.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '2':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(106,19,226,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 3.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '20':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(25,214,107,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 3.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '21':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(50,144,239,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 3.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '22':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(228,72,153,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 3.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '23':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(124,161,224,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 3.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '24':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(136,208,114,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 3.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '25':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(72,204,112,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 3.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '26':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(23,214,157,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 3.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '27':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(120,129,209,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 3.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '28':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(167,205,102,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 3.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '29':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(197,61,227,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 3.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '30':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(75,224,100,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 3.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '31':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(161,224,125,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 3.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '33':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(237,106,121,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 3.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '34':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(112,226,99,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 3.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '36':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(230,109,220,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 3.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '37':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(216,64,163,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 3.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '38':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(234,84,201,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 3.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '39':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(228,195,48,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 3.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '4':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(184,132,226,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 3.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '41':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(216,64,122,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 3.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '42':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(68,219,214,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 3.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '43':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(163,207,20,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 3.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '44':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(202,129,40,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 3.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '5':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(80,159,205,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 3.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '6':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(165,73,208,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 3.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '60':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(120,140,206,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 3.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '61':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(112,181,202,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 3.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case '8':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(128,204,52,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 3.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case 'D1':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(131,238,134,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 3.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case 'D10':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(88,85,218,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 3.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case 'D4':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(13,190,210,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 3.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case 'D5':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(204,37,79,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 3.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case 'D8':
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(216,188,126,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 3.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                default:
+                    return {
+                pane: 'pane_Lignes_TCL_3',
+                opacity: 1,
+                color: 'rgba(203,220,20,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 3.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_Lignes_TCL_3');
+        map.getPane('pane_Lignes_TCL_3').style.zIndex = 403;
+        map.getPane('pane_Lignes_TCL_3').style['mix-blend-mode'] = 'normal';
+        var layer_Lignes_TCL_3 = new L.geoJson.multiStyle(json_Lignes_TCL_3, {
+            attribution: '',
+            interactive: false,
+            dataVar: 'json_Lignes_TCL_3',
+            layerName: 'layer_Lignes_TCL_3',
+            pane: 'pane_Lignes_TCL_3',
+            onEachFeature: pop_Lignes_TCL_3,
+            styles: [style_Lignes_TCL_3_0,style_Lignes_TCL_3_1,]
+        });
+        bounds_group.addLayer(layer_Lignes_TCL_3);
+        map.addLayer(layer_Lignes_TCL_3);
+        function pop_Arret_Bus_4(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['code'] !== null ? autolinker.link(feature.properties['code'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['descriptio'] !== null ? autolinker.link(feature.properties['descriptio'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['id'] !== null ? autolinker.link(feature.properties['id'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['name'] !== null ? autolinker.link(feature.properties['name'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['parent_sta'] !== null ? autolinker.link(feature.properties['parent_sta'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['route_colo'] !== null ? autolinker.link(feature.properties['route_colo'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['route_id'] !== null ? autolinker.link(feature.properties['route_id'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['route_long'] !== null ? autolinker.link(feature.properties['route_long'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['route_shor'] !== null ? autolinker.link(feature.properties['route_shor'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['route_text'] !== null ? autolinker.link(feature.properties['route_text'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['wheelchair'] !== null ? autolinker.link(feature.properties['wheelchair'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+            var popup = layer.getPopup();
+            var content = popup.getContent();
+            var updatedContent = removeEmptyRowsFromPopupContent(content, feature);
+            popup.setContent(updatedContent);
+        }
+
+        function style_Arret_Bus_4_0() {
+            return {
+                pane: 'pane_Arret_Bus_4',
+                radius: 2.4,
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 2.0,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,255,255,1.0)',
+                interactive: false,
+            }
+        }
+        map.createPane('pane_Arret_Bus_4');
+        map.getPane('pane_Arret_Bus_4').style.zIndex = 404;
+        map.getPane('pane_Arret_Bus_4').style['mix-blend-mode'] = 'normal';
+        var layer_Arret_Bus_4 = new L.geoJson(json_Arret_Bus_4, {
+            attribution: '',
+            interactive: false,
+            dataVar: 'json_Arret_Bus_4',
+            layerName: 'layer_Arret_Bus_4',
+            pane: 'pane_Arret_Bus_4',
+            onEachFeature: pop_Arret_Bus_4,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.circleMarker(latlng, style_Arret_Bus_4_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_Arret_Bus_4);
+        map.addLayer(layer_Arret_Bus_4);
+        function pop_lycees_5(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2"><strong>Nature du lycée</strong><br />' + (feature.properties['lib_nature'] !== null ? autolinker.link(feature.properties['lib_nature'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>Nom de l\'établissement</strong><br />' + (feature.properties['appell_off'] !== null ? autolinker.link(feature.properties['appell_off'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>IPS</strong><br />' + (feature.properties['IPS'] !== null ? autolinker.link(feature.properties['IPS'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>IEL</strong><br />' + (feature.properties['IEL'] !== null ? autolinker.link(feature.properties['IEL'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+            var popup = layer.getPopup();
+            var content = popup.getContent();
+            var updatedContent = removeEmptyRowsFromPopupContent(content, feature);
+            popup.setContent(updatedContent);
+        }
+
+        function style_lycees_5_0(feature) {
+            switch(String(feature.properties['lib_nature'])) {
+                case 'Lycee d\'enseignement general':
+                    return {
+                pane: 'pane_lycees_5',
+                radius: 10.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(64,152,240,0.43529411764705883)',
+                interactive: true,
+            }
+                    break;
+                case 'Lycee d\'enseignement general et technologique':
+                    return {
+                pane: 'pane_lycees_5',
+                radius: 10.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(43,233,141,0.5294117647058824)',
+                interactive: true,
+            }
+                    break;
+                case 'Lycee polyvalent':
+                    return {
+                pane: 'pane_lycees_5',
+                radius: 10.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(167,73,193,0.49411764705882355)',
+                interactive: true,
+            }
+                    break;
+                case 'Lycee professionnel':
+                    return {
+                pane: 'pane_lycees_5',
+                radius: 10.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(138,42,147,0.38823529411764707)',
+                interactive: true,
+            }
+                    break;
+                case 'Section d\'enseignement professionnel':
+                    return {
+                pane: 'pane_lycees_5',
+                radius: 10.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(41,170,138,0.5137254901960784)',
+                interactive: true,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_lycees_5');
+        map.getPane('pane_lycees_5').style.zIndex = 405;
+        map.getPane('pane_lycees_5').style['mix-blend-mode'] = 'normal';
+        var layer_lycees_5 = new L.geoJson(json_lycees_5, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_lycees_5',
+            layerName: 'layer_lycees_5',
+            pane: 'pane_lycees_5',
+            onEachFeature: pop_lycees_5,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.circleMarker(latlng, style_lycees_5_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_lycees_5);
+        map.addLayer(layer_lycees_5);
+        function pop_Bu_Unilim_6(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2"><strong>Nom de la bibliothèque</strong><br />' + (feature.properties['BU'] !== null ? autolinker.link(feature.properties['BU'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+            var popup = layer.getPopup();
+            var content = popup.getContent();
+            var updatedContent = removeEmptyRowsFromPopupContent(content, feature);
+            popup.setContent(updatedContent);
+        }
+
+        function style_Bu_Unilim_6_0() {
+            return {
+                pane: 'pane_Bu_Unilim_6',
+                shape: 'diamond',
+                radius: 8.8,
+                opacity: 1,
+                color: 'rgba(61,128,53,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 2.0,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(84,176,74,1.0)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Bu_Unilim_6');
+        map.getPane('pane_Bu_Unilim_6').style.zIndex = 406;
+        map.getPane('pane_Bu_Unilim_6').style['mix-blend-mode'] = 'normal';
+        var layer_Bu_Unilim_6 = new L.geoJson(json_Bu_Unilim_6, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Bu_Unilim_6',
+            layerName: 'layer_Bu_Unilim_6',
+            pane: 'pane_Bu_Unilim_6',
+            onEachFeature: pop_Bu_Unilim_6,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.shapeMarker(latlng, style_Bu_Unilim_6_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_Bu_Unilim_6);
+        map.addLayer(layer_Bu_Unilim_6);
+        function pop_Etu_7(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2"><strong>Formation</strong><br />' + (feature.properties['Formation'] !== null ? autolinker.link(feature.properties['Formation'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+            var popup = layer.getPopup();
+            var content = popup.getContent();
+            var updatedContent = removeEmptyRowsFromPopupContent(content, feature);
+            popup.setContent(updatedContent);
+        }
+
+        function style_Etu_7_0() {
+            return {
+                pane: 'pane_Etu_7',
+        rotationAngle: 0.0,
+        rotationOrigin: 'center center',
+        icon: L.icon({
+            iconUrl: 'markers/Etu_7.svg',
+            iconSize: [15.2, 15.2]
+        }),
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Etu_7');
+        map.getPane('pane_Etu_7').style.zIndex = 407;
+        map.getPane('pane_Etu_7').style['mix-blend-mode'] = 'normal';
+        var layer_Etu_7 = new L.geoJson(json_Etu_7, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Etu_7',
+            layerName: 'layer_Etu_7',
+            pane: 'pane_Etu_7',
+            onEachFeature: pop_Etu_7,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.marker(latlng, style_Etu_7_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_Etu_7);
+        map.addLayer(layer_Etu_7);
+            var title = new L.Control();
+            title.onAdd = function (map) {
+                this._div = L.DomUtil.create('div', 'info');
+                this.update();
+                return this._div;
+            };
+            title.update = function () {
+                this._div.innerHTML = '<h2>Lycées en Haute Vienne et étudiants à l\'université de Limoges</h2>';
+            };
+            title.addTo(map);
+            var abstract = new L.Control({'position':'bottomleft'});
+            abstract.onAdd = function (map) {
+                this._div = L.DomUtil.create('div',
+                'leaflet-control abstract');
+                this._div.id = 'abstract'
+
+                    abstract.show();
+                    return this._div;
+                };
+                abstract.show = function () {
+                    this._div.classList.remove("abstract");
+                    this._div.classList.add("abstractUncollapsed");
+                    this._div.innerHTML = 'Production : CT2E, Université de Bordeaux';
+            };
+            abstract.addTo(map);
+        var baseMaps = {};
+        L.control.layers(baseMaps,{'<img src="legend/Etu_7.png" /> Etu': layer_Etu_7,'<img src="legend/Bu_Unilim_6.png" /> Bu_Unilim': layer_Bu_Unilim_6,'lycees<br /><table><tr><td style="text-align: center;"><img src="legend/lycees_5_Lyceedenseignementgeneral0.png" /></td><td>Lycee d\'enseignement general</td></tr><tr><td style="text-align: center;"><img src="legend/lycees_5_Lyceedenseignementgeneralettechnologique1.png" /></td><td>Lycee d\'enseignement general et technologique</td></tr><tr><td style="text-align: center;"><img src="legend/lycees_5_Lyceepolyvalent2.png" /></td><td>Lycee polyvalent</td></tr><tr><td style="text-align: center;"><img src="legend/lycees_5_Lyceeprofessionnel3.png" /></td><td>Lycee professionnel</td></tr><tr><td style="text-align: center;"><img src="legend/lycees_5_Sectiondenseignementprofessionnel4.png" /></td><td>Section d\'enseignement professionnel</td></tr></table>': layer_lycees_5,'<img src="legend/Arret_Bus_4.png" /> Arret_Bus': layer_Arret_Bus_4,'Lignes_TCL<br /><table><tr><td style="text-align: center;"><img src="legend/Lignes_TCL_3_10.png" /></td><td>1</td></tr><tr><td style="text-align: center;"><img src="legend/Lignes_TCL_3_101.png" /></td><td>10</td></tr><tr><td style="text-align: center;"><img src="legend/Lignes_TCL_3_112.png" /></td><td>11</td></tr><tr><td style="text-align: center;"><img src="legend/Lignes_TCL_3_123.png" /></td><td>12</td></tr><tr><td style="text-align: center;"><img src="legend/Lignes_TCL_3_134.png" /></td><td>13</td></tr><tr><td style="text-align: center;"><img src="legend/Lignes_TCL_3_145.png" /></td><td>14</td></tr><tr><td style="text-align: center;"><img src="legend/Lignes_TCL_3_166.png" /></td><td>16</td></tr><tr><td style="text-align: center;"><img src="legend/Lignes_TCL_3_177.png" /></td><td>17</td></tr><tr><td style="text-align: center;"><img src="legend/Lignes_TCL_3_188.png" /></td><td>18</td></tr><tr><td style="text-align: center;"><img src="legend/Lignes_TCL_3_199.png" /></td><td>19</td></tr><tr><td style="text-align: center;"><img src="legend/Lignes_TCL_3_210.png" /></td><td>2</td></tr><tr><td style="text-align: center;"><img src="legend/Lignes_TCL_3_2011.png" /></td><td>20</td></tr><tr><td style="text-align: center;"><img src="legend/Lignes_TCL_3_2112.png" /></td><td>21</td></tr><tr><td style="text-align: center;"><img src="legend/Lignes_TCL_3_2213.png" /></td><td>22</td></tr><tr><td style="text-align: center;"><img src="legend/Lignes_TCL_3_2314.png" /></td><td>23</td></tr><tr><td style="text-align: center;"><img src="legend/Lignes_TCL_3_2415.png" /></td><td>24</td></tr><tr><td style="text-align: center;"><img src="legend/Lignes_TCL_3_2516.png" /></td><td>25</td></tr><tr><td style="text-align: center;"><img src="legend/Lignes_TCL_3_2617.png" /></td><td>26</td></tr><tr><td style="text-align: center;"><img src="legend/Lignes_TCL_3_2718.png" /></td><td>27</td></tr><tr><td style="text-align: center;"><img src="legend/Lignes_TCL_3_2819.png" /></td><td>28</td></tr><tr><td style="text-align: center;"><img src="legend/Lignes_TCL_3_2920.png" /></td><td>29</td></tr><tr><td style="text-align: center;"><img src="legend/Lignes_TCL_3_3021.png" /></td><td>30</td></tr><tr><td style="text-align: center;"><img src="legend/Lignes_TCL_3_3122.png" /></td><td>31</td></tr><tr><td style="text-align: center;"><img src="legend/Lignes_TCL_3_3323.png" /></td><td>33</td></tr><tr><td style="text-align: center;"><img src="legend/Lignes_TCL_3_3424.png" /></td><td>34</td></tr><tr><td style="text-align: center;"><img src="legend/Lignes_TCL_3_3625.png" /></td><td>36</td></tr><tr><td style="text-align: center;"><img src="legend/Lignes_TCL_3_3726.png" /></td><td>37</td></tr><tr><td style="text-align: center;"><img src="legend/Lignes_TCL_3_3827.png" /></td><td>38</td></tr><tr><td style="text-align: center;"><img src="legend/Lignes_TCL_3_3928.png" /></td><td>39</td></tr><tr><td style="text-align: center;"><img src="legend/Lignes_TCL_3_429.png" /></td><td>4</td></tr><tr><td style="text-align: center;"><img src="legend/Lignes_TCL_3_4130.png" /></td><td>41</td></tr><tr><td style="text-align: center;"><img src="legend/Lignes_TCL_3_4231.png" /></td><td>42</td></tr><tr><td style="text-align: center;"><img src="legend/Lignes_TCL_3_4332.png" /></td><td>43</td></tr><tr><td style="text-align: center;"><img src="legend/Lignes_TCL_3_4433.png" /></td><td>44</td></tr><tr><td style="text-align: center;"><img src="legend/Lignes_TCL_3_534.png" /></td><td>5</td></tr><tr><td style="text-align: center;"><img src="legend/Lignes_TCL_3_635.png" /></td><td>6</td></tr><tr><td style="text-align: center;"><img src="legend/Lignes_TCL_3_6036.png" /></td><td>60</td></tr><tr><td style="text-align: center;"><img src="legend/Lignes_TCL_3_6137.png" /></td><td>61</td></tr><tr><td style="text-align: center;"><img src="legend/Lignes_TCL_3_838.png" /></td><td>8</td></tr><tr><td style="text-align: center;"><img src="legend/Lignes_TCL_3_D139.png" /></td><td>D1</td></tr><tr><td style="text-align: center;"><img src="legend/Lignes_TCL_3_D1040.png" /></td><td>D10</td></tr><tr><td style="text-align: center;"><img src="legend/Lignes_TCL_3_D441.png" /></td><td>D4</td></tr><tr><td style="text-align: center;"><img src="legend/Lignes_TCL_3_D542.png" /></td><td>D5</td></tr><tr><td style="text-align: center;"><img src="legend/Lignes_TCL_3_D843.png" /></td><td>D8</td></tr><tr><td style="text-align: center;"><img src="legend/Lignes_TCL_3_44.png" /></td><td></td></tr></table>': layer_Lignes_TCL_3,'<img src="legend/CU_Limoges_2.png" /> CU_Limoges': layer_CU_Limoges_2,'<img src="legend/Comm_87_1.png" /> Comm_87': layer_Comm_87_1,'<img src="legend/Dept_87_0.png" /> Dept_87': layer_Dept_87_0,},{collapsed:false}).addTo(map);
+        setBounds();
+        map.addControl(new L.Control.Search({
+            layer: layer_lycees_5,
+            initial: false,
+            hideMarkerOnCollapse: true,
+            propertyName: 'appell_off'}));
+        document.getElementsByClassName('search-button')[0].className +=
+         ' fa fa-binoculars';
+        var mapDiv = document.getElementById('map');
+        var row = document.createElement('div');
+        row.className="row";
+        row.id="all";
+        row.style.height = "100%";
+        var col1 = document.createElement('div');
+        col1.className="col9";
+        col1.id = "mapWindow";
+        col1.style.height = "99%";
+        col1.style.width = "80%";
+        col1.style.display = "inline-block";
+        var col2 = document.createElement('div');
+        col2.className="col3";
+        col2.id = "menu";
+        col2.style.display = "inline-block";
+        mapDiv.parentNode.insertBefore(row, mapDiv);
+        document.getElementById("all").appendChild(col1);
+        document.getElementById("all").appendChild(col2);
+        col1.appendChild(mapDiv)
+        var Filters = {"IPS": "real","IEL": "real","Formation": "str","lib_nature": "str","BU": "str"};
+        function filterFunc() {
+          map.eachLayer(function(lyr){
+          if ("options" in lyr && "dataVar" in lyr["options"]){
+            features = this[lyr["options"]["dataVar"]].features.slice(0);
+            try{
+              for (key in Filters){
+                keyS = key.replace(/[^a-zA-Z0-9_]/g, "")
+                if (Filters[key] == "str" || Filters[key] == "bool"){
+                  var selection = [];
+                  var options = document.getElementById("sel_" + keyS).options
+                  for (var i=0; i < options.length; i++) {
+                    if (options[i].selected) selection.push(options[i].value);
+                  }
+                    try{
+                      if (key in features[0].properties){
+                        for (i = features.length - 1;
+                          i >= 0; --i){
+                          if (selection.indexOf(
+                          features[i].properties[key])<0
+                          && selection.length>0) {
+                          features.splice(i,1);
+                          }
+                        }
+                      }
+                    } catch(err){
+                  }
+                }
+                if (Filters[key] == "int"){
+                  sliderVals =  document.getElementById(
+                    "div_" + keyS).noUiSlider.get();
+                  try{
+                    if (key in features[0].properties){
+                    for (i = features.length - 1; i >= 0; --i){
+                      if (parseInt(features[i].properties[key])
+                          < sliderVals[0]
+                          || parseInt(features[i].properties[key])
+                          > sliderVals[1]){
+                            features.splice(i,1);
+                          }
+                        }
+                      }
+                    } catch(err){
+                    }
+                  }
+                if (Filters[key] == "real"){
+                  sliderVals =  document.getElementById(
+                    "div_" + keyS).noUiSlider.get();
+                  try{
+                    if (key in features[0].properties){
+                    for (i = features.length - 1; i >= 0; --i){
+                      if (features[i].properties[key]
+                          < sliderVals[0]
+                          || features[i].properties[key]
+                          > sliderVals[1]){
+                            features.splice(i,1);
+                          }
+                        }
+                      }
+                    } catch(err){
+                    }
+                  }
+                if (Filters[key] == "date"
+                  || Filters[key] == "datetime"
+                  || Filters[key] == "time"){
+                  try{
+                    if (key in features[0].properties){
+                      HTMLkey = key.replace(/[&\/\\#,+()$~%.'":*?<>{} ]/g, '');
+                      startdate = document.getElementById("dat_" +
+                        HTMLkey + "_date1").value.replace(" ", "T");
+                      enddate = document.getElementById("dat_" +
+                        HTMLkey + "_date2").value.replace(" ", "T");
+                      for (i = features.length - 1; i >= 0; --i){
+                        if (features[i].properties[key] < startdate
+                          || features[i].properties[key] > enddate){
+                          features.splice(i,1);
+                        }
+                      }
+                    }
+                  } catch(err){
+                  }
+                }
+              }
+            } catch(err){
+            }
+          this[lyr["options"]["layerName"]].clearLayers();
+          this[lyr["options"]["layerName"]].addData(features);
+          }
+          })
+        }
+            document.getElementById("menu").appendChild(
+                document.createElement("div"));
+            var div_IPS = document.createElement("div");
+            div_IPS.id = "div_IPS";
+            div_IPS.className = "slider";
+            document.getElementById("menu").appendChild(div_IPS);
+            var lab_IPS = document.createElement('div');
+            lab_IPS.innerHTML  = 'IPS: <span id="val_IPS"></span>';
+            lab_IPS.className = 'filterlabel';
+            document.getElementById("menu").appendChild(lab_IPS);
+            var reset_IPS = document.createElement('div');
+            reset_IPS.innerHTML = 'clear filter';
+            reset_IPS.className = 'filterlabel';
+            lab_IPS.className = 'filterlabel';
+            reset_IPS.onclick = function() {
+                sel_IPS.noUiSlider.reset();
+            };
+            document.getElementById("menu").appendChild(reset_IPS);
+            var sel_IPS = document.getElementById('div_IPS');
+            noUiSlider.create(sel_IPS, {
+                connect: true,
+                start: [72.0, 134.3],
+                range: {
+                min: 72.0,
+                max: 134.3
+                }
+            });
+            sel_IPS.noUiSlider.on('update', function (values) {
+            val_IPS = document.getElementById('val_IPS');
+            val_IPS.innerHTML = values.join(' - ');
+                filterFunc()
+            });
+            document.getElementById("menu").appendChild(
+                document.createElement("div"));
+            var div_IEL = document.createElement("div");
+            div_IEL.id = "div_IEL";
+            div_IEL.className = "slider";
+            document.getElementById("menu").appendChild(div_IEL);
+            var lab_IEL = document.createElement('div');
+            lab_IEL.innerHTML  = 'IEL: <span id="val_IEL"></span>';
+            lab_IEL.className = 'filterlabel';
+            document.getElementById("menu").appendChild(lab_IEL);
+            var reset_IEL = document.createElement('div');
+            reset_IEL.innerHTML = 'clear filter';
+            reset_IEL.className = 'filterlabel';
+            lab_IEL.className = 'filterlabel';
+            reset_IEL.onclick = function() {
+                sel_IEL.noUiSlider.reset();
+            };
+            document.getElementById("menu").appendChild(reset_IEL);
+            var sel_IEL = document.getElementById('div_IEL');
+            noUiSlider.create(sel_IEL, {
+                connect: true,
+                start: [94.4, 120.4],
+                range: {
+                min: 94.4,
+                max: 120.4
+                }
+            });
+            sel_IEL.noUiSlider.on('update', function (values) {
+            val_IEL = document.getElementById('val_IEL');
+            val_IEL.innerHTML = values.join(' - ');
+                filterFunc()
+            });
+            document.getElementById("menu").appendChild(
+                document.createElement("div"));
+            var div_Formation = document.createElement('div');
+            div_Formation.id = "div_Formation";
+            div_Formation.className= "filterselect";
+            document.getElementById("menu").appendChild(div_Formation);
+            sel_Formation = document.createElement('select');
+            sel_Formation.multiple = true;
+            sel_Formation.size = 4;
+            sel_Formation.id = "sel_Formation";
+            var Formation_options_str = "<option value='' unselected></option>";
+            sel_Formation.onchange = function(){filterFunc()};
+            Formation_options_str  += '<option value="Arts lettres et langues">Arts lettres et langues</option>';
+            Formation_options_str  += '<option value="Droit et economie">Droit et economie</option>';
+            Formation_options_str  += '<option value="Sante">Sante</option>';
+            Formation_options_str  += '<option value="Sciences et technologies">Sciences et technologies</option>';
+            sel_Formation.innerHTML = Formation_options_str;
+            div_Formation.appendChild(sel_Formation);
+            var lab_Formation = document.createElement('div');
+            lab_Formation.innerHTML = 'Formation';
+            lab_Formation.className = 'filterlabel';
+            div_Formation.appendChild(lab_Formation);
+            var reset_Formation = document.createElement('div');
+            reset_Formation.innerHTML = 'clear filter';
+            reset_Formation.className = 'filterlabel';
+            reset_Formation.onclick = function() {
+                var options = document.getElementById("sel_Formation").options;
+                for (var i=0; i < options.length; i++) {
+                    options[i].selected = false;
+                }
+                filterFunc();
+            };
+            div_Formation.appendChild(reset_Formation);
+            document.getElementById("menu").appendChild(
+                document.createElement("div"));
+            var div_lib_nature = document.createElement('div');
+            div_lib_nature.id = "div_lib_nature";
+            div_lib_nature.className= "filterselect";
+            document.getElementById("menu").appendChild(div_lib_nature);
+            sel_lib_nature = document.createElement('select');
+            sel_lib_nature.multiple = true;
+            sel_lib_nature.size = 5;
+            sel_lib_nature.id = "sel_lib_nature";
+            var lib_nature_options_str = "<option value='' unselected></option>";
+            sel_lib_nature.onchange = function(){filterFunc()};
+            lib_nature_options_str  += '<option value="Lycee d&apos;enseignement general">Lycee d&apos;enseignement general</option>';
+            lib_nature_options_str  += '<option value="Lycee d&apos;enseignement general et technologique">Lycee d&apos;enseignement general et technologique</option>';
+            lib_nature_options_str  += '<option value="Lycee polyvalent">Lycee polyvalent</option>';
+            lib_nature_options_str  += '<option value="Lycee professionnel">Lycee professionnel</option>';
+            lib_nature_options_str  += '<option value="Section d&apos;enseignement professionnel">Section d&apos;enseignement professionnel</option>';
+            sel_lib_nature.innerHTML = lib_nature_options_str;
+            div_lib_nature.appendChild(sel_lib_nature);
+            var lab_lib_nature = document.createElement('div');
+            lab_lib_nature.innerHTML = 'lib_nature';
+            lab_lib_nature.className = 'filterlabel';
+            div_lib_nature.appendChild(lab_lib_nature);
+            var reset_lib_nature = document.createElement('div');
+            reset_lib_nature.innerHTML = 'clear filter';
+            reset_lib_nature.className = 'filterlabel';
+            reset_lib_nature.onclick = function() {
+                var options = document.getElementById("sel_lib_nature").options;
+                for (var i=0; i < options.length; i++) {
+                    options[i].selected = false;
+                }
+                filterFunc();
+            };
+            div_lib_nature.appendChild(reset_lib_nature);
+            document.getElementById("menu").appendChild(
+                document.createElement("div"));
+            var div_BU = document.createElement('div');
+            div_BU.id = "div_BU";
+            div_BU.className= "filterselect";
+            document.getElementById("menu").appendChild(div_BU);
+            sel_BU = document.createElement('select');
+            sel_BU.multiple = true;
+            sel_BU.size = 8;
+            sel_BU.id = "sel_BU";
+            var BU_options_str = "<option value='' unselected></option>";
+            sel_BU.onchange = function(){filterFunc()};
+            BU_options_str  += '<option value="BU - Carrefour etudiants">BU - Carrefour etudiants</option>';
+            BU_options_str  += '<option value="BU - Droit Economie">BU - Droit Economie</option>';
+            BU_options_str  += '<option value="BU - ENSIL-ENSCI">BU - ENSIL-ENSCI</option>';
+            BU_options_str  += '<option value="BU - INSPE">BU - INSPE</option>';
+            BU_options_str  += '<option value="BU - IREM">BU - IREM</option>';
+            BU_options_str  += '<option value="BU - IUT">BU - IUT</option>';
+            BU_options_str  += '<option value="BU - Sante">BU - Sante</option>';
+            BU_options_str  += '<option value="BU Lettre SH">BU Lettre SH</option>';
+            sel_BU.innerHTML = BU_options_str;
+            div_BU.appendChild(sel_BU);
+            var lab_BU = document.createElement('div');
+            lab_BU.innerHTML = 'BU';
+            lab_BU.className = 'filterlabel';
+            div_BU.appendChild(lab_BU);
+            var reset_BU = document.createElement('div');
+            reset_BU.innerHTML = 'clear filter';
+            reset_BU.className = 'filterlabel';
+            reset_BU.onclick = function() {
+                var options = document.getElementById("sel_BU").options;
+                for (var i=0; i < options.length; i++) {
+                    options[i].selected = false;
+                }
+                filterFunc();
+            };
+            div_BU.appendChild(reset_BU);
+        </script>
+    </body>
+</html>
